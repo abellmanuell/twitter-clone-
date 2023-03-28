@@ -38,7 +38,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
       - name: Install Dependiencies
-        run: pnpm install
+        run: pnpm i
       - name: Build React
         run: pnpm run build --if-present
 
