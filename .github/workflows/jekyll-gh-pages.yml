@@ -37,6 +37,9 @@ jobs:
           destination: ./_site
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
+      
+      - name: install pnpm
+        run: npm install pnpm
         
       - name: Install Dependencies
         run: pnpm i
