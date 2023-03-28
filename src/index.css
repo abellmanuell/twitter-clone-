@@ -1,0 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .nav-bar {
+    @apply p-3 rounded-full hover:bg-neutral-100  inline-flex justify-center items-center space-x-4;
+  }
+}
