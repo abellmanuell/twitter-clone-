@@ -1,52 +1,41 @@
-name: Deploy to React GitHub Pages
+name: "Build and Deploy"
 
 on:
-     # Trigger the workflow every time you push to the `main` branch
   push:
-    branches: [ main ]
-      # Allows you to run this workflow manually from the Actions tab on GitHub.
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
 
-  workflow_dispatch:
-
-      # Allow this job to clone the repo and create a page deployment
 permissions:
-      contents: read
-      pages: write
-      id-token: write
+  contents: write
 
 jobs:
-      build:
-        runs-on: ubuntu-latest
-        steps:
-        - name: Check out your repository using git
-          uses: actions/checkout@v2
+  build:
+    runs-on: ubuntu-latest
 
-        - name: Use Node.js 16
-          uses: actions/setup-node@v2
-          with:
-            node-version: '16'
-            cache: 'npm'
+    strategy:
+      matrix:
+        node-version: [node]
 
-        # Not using npm? Change `npm ci` to `yarn install` or `pnpm i`
-        - name: Install dependencies
-          run: pnpm i
+    steps:
+      - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+        with:
+          version: latest
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "pnpm"
 
-        # Not using npm? Change `npm run build` to `yarn build` or `pnpm run build`
-        - name: Build React
-          run: pnpm run build --if-present
+      - name: Install dependencies
+        run: pnpm install
 
-        - name: Upload artifact
-          uses: actions/upload-pages-artifact@v1
-          with:
-            path: ./build
+      - name: Build
+        run: pnpm run build
 
-      deploy:
-        environment:
-          name: github-pages
-          url: ${{ steps.deployment.outputs.page_url }}
-        runs-on: ubuntu-latest
-        needs: build
-        steps:
-          - name: Deploy to GitHub Pages
-            id: deployment
-            uses: actions/deploy-pages@v1
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
